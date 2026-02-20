@@ -1,1 +1,1 @@
-let title = document.getElementsByClassName("title");
+//BLANK

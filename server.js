@@ -25,20 +25,6 @@ const server = http.createServer((req, res) => {
     });
   }
 
-  // REGISTER
-  else if (req.url === '/register' && req.method === 'GET') {
-    const filePath = path.join(__dirname, 'register.html');
-
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(500);
-        res.end('Error loading register page');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(data);
-      }
-    });
-  }
 
   // DASHBOARD
   else if (req.url === '/dashboard' && req.method === 'GET') {

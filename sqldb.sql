@@ -69,6 +69,7 @@ CREATE TABLE poll_options (
         FOREIGN KEY (poll_id) REFERENCES polls (id)
         ON UPDATE CASCADE ON DELETE CASCADE,
 
+        
     INDEX idx_poll_options_poll_id (poll_id),
     -- Unique ordering per poll
     UNIQUE KEY uq_poll_options_order (poll_id, display_order)

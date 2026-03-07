@@ -1,6 +1,9 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const server = http.createServer((req, res) => {
 
@@ -12,7 +15,7 @@ const server = http.createServer((req, res) => {
 
   // LOGIN
   else if (req.url === '/login' && req.method === 'GET') {
-    const filePath = path.join(__dirname, 'login.html');
+    const filePath = path.join(__dirname, 'college-portal-2.html');
 
     fs.readFile(filePath, (err, data) => {
       if (err) {

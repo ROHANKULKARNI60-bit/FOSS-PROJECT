@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Voting System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0f1a;
+    --card: #111827;
+    --card-border: rgba(255,255,255,0.07);
+    --accent: #4f8ef7;
+    --accent2: #a78bfa;
+    --accent-glow: rgba(79,142,247,0.25);
+    --text: #f0f4ff;
+    --muted: #8b95aa;
+    --input-bg: #1a2236;
+    --input-border: rgba(255,255,255,0.1);
+    --input-focus: #4f8ef7;
+    --error: #f87171;
+    --success: #34d399;
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(79,142,247,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%, rgba(167,139,250,0.10) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .portal-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  /* Header badge */
+  .portal-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    justify-content: center;
+  }
+  .badge-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform: scale(1); }
+    50% { opacity:.5; transform: scale(1.3); }
+  }
+  .badge-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Main card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 40px 44px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 24px 64px rgba(0,0,0,0.5),
+      0 0 120px rgba(79,142,247,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79,142,247,0.5), rgba(167,139,250,0.4), transparent);
+  }
+
+  /* Title */
+  .portal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    line-height: 1.4;
+    word-break: break-word;
+    white-space: normal;
+  }
+  .portal-title span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .portal-subtitle {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-weight: 300;
+    margin-top: 6px;
+  }
+
+  /* Tab switcher */
+  .tab-switcher {
+    display: flex;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 1px solid var(--card-border);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 9px 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.25s ease;
+    letter-spacing: 0.2px;
+  }
+  .tab-btn.active {
+    background: var(--input-bg);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* Forms */
+  .form-panel { display: none; }
+  .form-panel.active {
+    display: block;
+    animation: fadeSlideUp 0.35s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .form-group {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .form-group label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b95aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  .form-group select option {
+    background: #1a2236;
+    color: var(--text);
+  }
+  .form-group input::placeholder { color: rgba(139,149,170,0.5); }
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background: rgba(26,34,54,0.9);
+  }
+  .form-group input.error,
+  .form-group select.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(248,113,113,0.15);
+  }
+  .error-msg {
+    font-size: 11.5px;
+    color: var(--error);
+    margin-top: 5px;
+    display: none;
+    padding-left: 2px;
+  }
+  .error-msg.show { display: block; }
+
+  /* Password wrapper */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 44px; }
+  .pw-toggle {
+    position: absolute;
+    right: 13px; top: 50%; transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    padding: 4px; display: flex; align-items: center;
+    transition: color 0.2s;
+  }
+  .pw-toggle:hover { color: var(--text); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--card-border);
+    margin: 20px 0;
+  }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+    box-shadow: 0 4px 20px rgba(79,142,247,0.3);
+  }
+  .btn-submit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+  .btn-submit:hover::after { background: rgba(255,255,255,0.08); }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled {
+    opacity: 0.6; cursor: not-allowed; transform: none;
+  }
+  .btn-submit.success {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+  }
+  .btn-submit.granted {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 4px 20px rgba(16,185,129,0.3);
+  }
+  .btn-submit.retry {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px); }
+    40%     { transform: translateX(6px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+
+  /* Status message */
+  .status-msg {
+    margin-top: 14px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-msg.show { display: flex; animation: fadeSlideUp 0.3s ease both; }
+  .status-msg.success {
+    background: rgba(52,211,153,0.1);
+    border: 1px solid rgba(52,211,153,0.25);
+    color: var(--success);
+  }
+  .status-msg.error {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.25);
+    color: var(--error);
+  }
+
+  /* Switch link */
+  .switch-link {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .switch-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding-bottom: 1px;
+    border-bottom: 1px solid transparent;
+  }
+  .switch-link a:hover {
+    color: var(--accent2);
+    border-color: var(--accent2);
+  }
+
+  /* Scrollable form on small heights */
+  @media (max-height: 700px) {
+    .card { padding: 28px 24px; }
+  }
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; border-radius: 18px; }
+    .portal-title { font-size: 22px; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--input-border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="portal-wrapper">
+  <div class="portal-badge">
+    <div class="badge-dot"></div>
+    <span class="badge-text">Secure Portal v2.1</span>
+  </div>
+
+  <div class="card">
+    <h1 class="portal-title">Digital <span>Voting</span> System</h1>
+    <p class="portal-subtitle">Authenticate to access the voting platform.</p>
+
+    <div class="tab-switcher">
+      <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
+      <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Login</button>
+    </div>
+
+    <!-- REGISTRATION FORM -->
+    <div class="form-panel active" id="panelRegister">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="e.g. Aryan Sharma" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-name">Name is required.</div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="you@university.edu" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-email">Enter a valid email.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="reg-phone" placeholder="+91 XXXXX XXXXX" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-phone">Enter a valid 10-digit number.</div>
+        </div>
+        <div class="form-group">
+          <label>SAP ID</label>
+          <input type="text" id="reg-sap" placeholder="70XXXXXXXX" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-sap">SAP ID is required.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Branch</label>
+          <select id="reg-branch">
+            <option value="">Select branch</option>
+            <option>Artificial Intelligence</option>
+            <option>Civil</option>
+            <option>Computer Engineering</option>
+            <option>Computer Science - Business System</option>
+            <option>Computer Science - Data Science</option>
+            <option>Data Science</option>
+            <option>Electronics and Telecommunications</option>
+            <option>Information Technology</option>
+            <option>Mechanical</option>
+            <option>Mechatronics</option>
+          </select>
+          <div class="error-msg" id="err-reg-branch">Select your branch.</div>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="reg-year">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+          <div class="error-msg" id="err-reg-year">Select your year.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password"/>
+          <button class="pw-toggle" onclick="togglePw('reg-password', this)" tabindex="-1">
+            <svg id="eye-reg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="error-msg" id="err-reg-password">Password must be at least 6 characters.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="btn-submit" id="btn-register" onclick="handleRegister()">Register</button>
+      <div class="status-msg" id="status-register">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Registration Successful
+      </div>
+
+
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel" id="panelLogin">
+      <div class="form-group">
+        <label>SAP ID</label>
+        <input type="text" id="login-sap" placeholder="70XXXXXXXX" autocomplete="off"/>
+        <div class="error-msg" id="err-login-sap">SAP ID is required.</div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@university.edu" autocomplete="off"/>
+        <div class="error-msg" id="err-login-email">Enter a valid email.</div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password"/>
+          <button class="pw-toggle" onclick="togglePw('login-password', this)" tabindex="-1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="error-msg" id="err-login-password">Password is required.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="btn-submit" id="btn-login" onclick="handleLogin()">Request Access</button>
+      <div class="status-msg" id="status-login-success">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Access Granted
+      </div>
+      <div class="status-msg" id="status-login-fail">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Invalid credentials. Please retry.
+      </div>
+
+      <div class="switch-link">
+        New here? <a onclick="switchTab('register')">Create Account</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── State ──────────────────────────────────────────────
+  let registeredUsers = []; // [{name, email, phone, sap, branch, year, password}]
+
+  // ─── Tab Switching ───────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    clearErrors();
+    hideStatuses();
+    resetLoginBtn();
+  }
+
+  // ─── Utilities ───────────────────────────────────────────
+  function val(id) { return document.getElementById(id).value.trim(); }
+
+  function setError(fieldId, errId, show) {
+    const field = document.getElementById(fieldId);
+    const err   = document.getElementById(errId);
+    field.classList.toggle('error', show);
+    err.classList.toggle('show', show);
+  }
+
+  function clearErrors() {
+    document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('input, select').forEach(e => e.classList.remove('error'));
+  }
+
+  function hideStatuses() {
+    document.querySelectorAll('.status-msg').forEach(e => e.classList.remove('show'));
+  }
+
+  function resetLoginBtn() {
+    const btn = document.getElementById('btn-login');
+    btn.textContent = 'Request Access';
+    btn.className = 'btn-submit';
+    btn.disabled = false;
+  }
+
+  function togglePw(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.innerHTML = isText
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+  }
+
+  // ─── Registration ────────────────────────────────────────
+  function handleRegister() {
+    clearErrors();
+    hideStatuses();
+
+    const name     = val('reg-name');
+    const email    = val('reg-email');
+    const phone    = val('reg-phone');
+    const sap      = val('reg-sap');
+    const branch   = val('reg-branch');
+    const year     = val('reg-year');
+    const password = val('reg-password');
+
+    let valid = true;
+
+    if (!name) { setError('reg-name', 'err-reg-name', true); valid = false; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('reg-email', 'err-reg-email', true); valid = false;
+    }
+    if (!phone || !/^\+?[\d\s\-]{10,14}$/.test(phone.replace(/\s/g, ''))) {
+      setError('reg-phone', 'err-reg-phone', true); valid = false;
+    }
+    if (!sap) { setError('reg-sap', 'err-reg-sap', true); valid = false; }
+    if (!branch) { setError('reg-branch', 'err-reg-branch', true); valid = false; }
+    if (!year) { setError('reg-year', 'err-reg-year', true); valid = false; }
+    if (!password || password.length < 6) {
+      setError('reg-password', 'err-reg-password', true); valid = false;
+    }
+
+    if (!valid) return;
+
+    // Store user
+    registeredUsers.push({ name, email, phone, sap, branch, year, password });
+
+    const btn = document.getElementById('btn-register');
+    const msg = document.getElementById('status-register');
+
+    btn.textContent = 'Registered ✓';
+    btn.classList.add('success');
+    btn.disabled = true;
+    msg.classList.add('show', 'success');
+  }
+
+  // ─── Login ───────────────────────────────────────────────
+  function handleLogin() {
+    clearErrors();
+    hideStatuses();
+
+    const sap      = val('login-sap');
+    const email    = val('login-email');
+    const password = val('login-password');
+
+    let valid = true;
+
+    if (!sap) { setError('login-sap', 'err-login-sap', true); valid = false; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('login-email', 'err-login-email', true); valid = false;
+    }
+    if (!password) { setError('login-password', 'err-login-password', true); valid = false; }
+
+    if (!valid) return;
+
+    const btn     = document.getElementById('btn-login');
+    const success = document.getElementById('status-login-success');
+    const fail    = document.getElementById('status-login-fail');
+
+    const user = registeredUsers.find(u =>
+      u.sap === sap && u.email === email && u.password === password
+    );
+
+    if (user) {
+      btn.textContent = 'Access Granted ✓';
+      btn.classList.add('granted');
+      btn.disabled = true;
+      success.classList.add('show', 'success');
+    } else {
+      btn.textContent = 'Retry';
+      btn.className = 'btn-submit retry';
+      fail.classList.add('show', 'error');
+      setTimeout(() => {
+        btn.textContent = 'Request Access';
+        btn.className = 'btn-submit';
+        btn.disabled = false;
+      }, 2500);
+    }
+  }
+
+  // ─── Remove error on input ───────────────────────────────
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', () => {
+      el.classList.remove('error');
+      const errEl = document.getElementById('err-' + el.id);
+      if (errEl) errEl.classList.remove('show');
+    });
+  });
+</script>
+</body>
+</html>

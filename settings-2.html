@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Voting System — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0f1a;
+    --card: #111827;
+    --card-border: rgba(255,255,255,0.07);
+    --accent: #4f8ef7;
+    --accent2: #a78bfa;
+    --accent-glow: rgba(79,142,247,0.18);
+    --text: #f0f4ff;
+    --muted: #8b95aa;
+    --input-bg: #1a2236;
+    --input-border: rgba(255,255,255,0.1);
+    --input-focus: #4f8ef7;
+    --error: #f87171;
+    --success: #34d399;
+    --danger: #ef4444;
+    --radius: 20px;
+  }
+
+  /* Light theme overrides */
+  :root.theme-light {
+    --bg: #f0f4fb;
+    --card: #ffffff;
+    --card-border: rgba(0,0,0,0.08);
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --accent-glow: rgba(37,99,235,0.15);
+    --text: #0f172a;
+    --muted: #64748b;
+    --input-bg: #f8fafc;
+    --input-border: rgba(0,0,0,0.1);
+    --input-focus: #2563eb;
+    --error: #dc2626;
+    --success: #059669;
+    --danger: #dc2626;
+  }
+
+  /* Light mode background gradient */
+  :root.theme-light body::before {
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(37,99,235,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 85% 80%, rgba(124,58,237,0.06) 0%, transparent 50%);
+  }
+
+  /* Smooth theme transition */
+  body, .sidebar, .settings-panel, .info-card, .stat-box,
+  .form-group input, .group-item, .nav-item, .theme-option,
+  .toggle-row, .logout-info, .modal {
+    transition: background 0.35s ease, border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  /* Light mode card shadow */
+  :root.theme-light .sidebar,
+  :root.theme-light .settings-panel {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* Light mode topbar shimmer */
+  :root.theme-light .sidebar::before,
+  :root.theme-light .settings-panel::before {
+    background: linear-gradient(90deg, transparent, rgba(37,99,235,0.3), rgba(124,58,237,0.25), transparent);
+  }
+
+  /* Light mode nav active */
+  :root.theme-light .nav-item.active {
+    background: rgba(37,99,235,0.08);
+    border-color: rgba(37,99,235,0.2);
+  }
+
+  /* Light mode group item */
+  :root.theme-light .group-item {
+    background: #f8fafc;
+  }
+
+  /* Light mode toggle */
+  :root.theme-light .toggle-slider {
+    background: rgba(0,0,0,0.08);
+    border-color: rgba(0,0,0,0.12);
+  }
+  :root.theme-light .toggle-slider::before {
+    background: #94a3b8;
+  }
+
+  /* Light mode brand pulse */
+  :root.theme-light .brand-dot {
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 40px 48px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(79,142,247,0.10) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 85% 80%, rgba(167,139,250,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    position: relative; z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.5; transform:scale(1.35); }
+  }
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--text); letter-spacing: 0.2px;
+  }
+  .brand-name span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-badge {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    padding: 6px 14px;
+  }
+
+  /* ── Page layout ── */
+  .page-layout {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Sidebar nav ── */
+  .sidebar {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    position: sticky;
+    top: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .sidebar::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79,142,247,0.5), rgba(167,139,250,0.4), transparent);
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .sidebar-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .sidebar-heading span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sidebar-sub {
+    font-size: 12px; color: var(--muted); font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .nav-section-label {
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: var(--muted);
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .nav-item svg { flex-shrink: 0; opacity: 0.6; transition: opacity 0.2s; }
+  .nav-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  .nav-item:hover svg { opacity: 1; }
+  .nav-item.active {
+    background: rgba(79,142,247,0.1);
+    border-color: rgba(79,142,247,0.2);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .nav-item.active svg { opacity: 1; color: var(--accent); }
+  .nav-item.danger { color: var(--danger); }
+  .nav-item.danger svg { opacity: 0.7; color: var(--danger); }
+  .nav-item.danger:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--card-border);
+    margin: 16px 0;
+  }
+
+  /* ── Main content ── */
+  .main-content { display: flex; flex-direction: column; gap: 0; }
+
+  .settings-panel {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: fadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
+    display: none;
+  }
+  .settings-panel.active { display: block; }
+  .settings-panel::before {
+    content: '';
+    display: block; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(167,139,250,0.35), transparent);
+  }
+
+  .panel-header {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .panel-header-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(79,142,247,0.1);
+    border: 1px solid rgba(79,142,247,0.2);
+    flex-shrink: 0;
+  }
+  .panel-header-icon.purple {
+    background: rgba(167,139,250,0.1);
+    border-color: rgba(167,139,250,0.2);
+  }
+  .panel-header-icon.danger {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.2);
+  }
+  .panel-header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 800;
+    color: var(--text); letter-spacing: -0.2px;
+  }
+  .panel-header-sub {
+    font-size: 12.5px; color: var(--muted);
+    margin-top: 3px; font-weight: 300;
+  }
+
+  .panel-body { padding: 30px 32px; }
+
+  /* ── Form fields ── */
+  .form-section-label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 18px;
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%; padding: 12px 16px;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 400;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-group input::placeholder { color: rgba(139,149,170,0.45); }
+  .form-group input:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.18);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Save button */
+  .btn-save {
+    padding: 12px 28px;
+    border: none; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 13.5px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.3px;
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 16px rgba(79,142,247,0.3);
+    margin-top: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-save:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,142,247,0.4); }
+  .btn-save:active { transform: scale(0.98); }
+  .btn-save.saved {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+  }
+
+  /* ── Appearance toggles ── */
+  .appearance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .theme-option {
+    border: 1.5px solid var(--card-border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .theme-option:hover { border-color: rgba(79,142,247,0.3); }
+  .theme-option.selected {
+    border-color: var(--accent);
+    background: rgba(79,142,247,0.08);
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .theme-preview {
+    width: 100%; height: 52px; border-radius: 8px;
+    margin-bottom: 10px; position: relative; overflow: hidden;
+  }
+  .theme-preview.dark { background: #0b0f1a; border: 1px solid rgba(255,255,255,0.08); }
+  .theme-preview.dark::after {
+    content: ''; position: absolute;
+    top: 8px; left: 8px; right: 8px; height: 10px;
+    border-radius: 4px; background: #1a2236;
+  }
+  .theme-preview.light { background: #f3f4f6; border: 1px solid rgba(0,0,0,0.08); }
+  .theme-preview.light::after {
+    content: ''; position: absolute;
+    top: 8px; left: 8px; right: 8px; height: 10px;
+    border-radius: 4px; background: #fff;
+  }
+  .theme-preview.system {
+    background: linear-gradient(135deg, #0b0f1a 50%, #f3f4f6 50%);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .theme-label { font-size: 12px; font-weight: 500; color: var(--text); }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-info {}
+  .toggle-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .toggle-desc { font-size: 12px; color: var(--muted); }
+
+  .toggle {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.1);
+    border-radius: 30px; cursor: pointer;
+    transition: background 0.25s;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--muted);
+    bottom: 2px; left: 2px;
+    transition: transform 0.25s, background 0.25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle input:checked + .toggle-slider { background: rgba(79,142,247,0.25); border-color: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--accent); }
+
+  /* ── Delete groups ── */
+  .group-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+  .group-item {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    transition: border-color 0.2s;
+  }
+  .group-item:hover { border-color: rgba(239,68,68,0.25); }
+  .group-item-left { display: flex; align-items: center; gap: 12px; }
+  .group-dot {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .group-dot.blue  { background: rgba(79,142,247,0.15); }
+  .group-dot.purple { background: rgba(167,139,250,0.15); }
+  .group-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .group-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .btn-delete-group {
+    padding: 7px 14px; border-radius: 9px;
+    border: 1px solid rgba(239,68,68,0.3);
+    background: rgba(239,68,68,0.06);
+    color: var(--danger); font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-delete-group:hover { background: rgba(239,68,68,0.12); border-color: var(--danger); }
+
+  /* ── Logout ── */
+  .logout-area { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .logout-info {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.15);
+    border-radius: 14px; padding: 18px 20px;
+    display: flex; gap: 14px; align-items: flex-start;
+    width: 100%;
+  }
+  .logout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .logout-info-text {}
+  .logout-info-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .logout-info-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .btn-logout {
+    padding: 13px 32px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.3px;
+    display: flex; align-items: center; gap: 9px;
+    transition: all 0.22s ease;
+    box-shadow: 0 4px 16px rgba(239,68,68,0.3);
+  }
+  .btn-logout:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(239,68,68,0.4); }
+  .btn-logout:active { transform: scale(0.98); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--card);
+    border: 1px solid rgba(52,211,153,0.3);
+    border-radius: 14px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13.5px; font-weight: 500; color: var(--success);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 999;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px; padding: 32px 30px;
+    width: 100%; max-width: 380px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+  }
+  .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+  .modal::before {
+    content: ''; display: block; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(239,68,68,0.4), transparent);
+    position: absolute; top: 0; left: 0; right: 0;
+  }
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 8px;
+  }
+  .modal-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-cancel {
+    padding: 10px 20px; border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: transparent; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cancel:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .btn-confirm-delete {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-confirm-delete:hover { opacity: 0.9; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    body { padding: 24px 20px; }
+    .page-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .appearance-grid { grid-template-columns: repeat(3,1fr); }
+  }
+  @media (max-width: 480px) {
+    body { padding: 16px; }
+    .form-row { grid-template-columns: 1fr; }
+    .appearance-grid { grid-template-columns: 1fr 1fr; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .panel-body { padding: 20px; }
+    .panel-header { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Digital <span>Voting</span> System</div>
+  </div>
+  <div class="nav-badge">Settings</div>
+</div>
+
+<div class="page-layout">
+
+  <!-- ── Sidebar ── -->
+  <div class="sidebar">
+    <div class="sidebar-heading"><span>Settings</span></div>
+    <div class="sidebar-sub">Manage your preferences</div>
+
+    <div class="nav-section-label">General</div>
+
+    <div class="nav-item active" onclick="showPanel('appearance', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h10"/></svg>
+      Appearance
+    </div>
+
+    <div class="nav-item" onclick="showPanel('personal', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Personal Information
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Manage</div>
+
+    <div class="nav-item" onclick="showPanel('groups', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Delete Groups
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-item danger" onclick="showPanel('logout', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </div>
+  </div>
+
+  <!-- ── Main content ── -->
+  <div class="main-content">
+
+    <!-- APPEARANCE -->
+    <div class="settings-panel active" id="panel-appearance">
+      <div class="panel-header">
+        <div class="panel-header-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h10"/></svg>
+        </div>
+        <div>
+          <div class="panel-header-title">Appearance</div>
+          <div class="panel-header-sub">Customise how the portal looks and feels</div>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <div class="form-section-label" style="margin-bottom:16px;">Theme</div>
+        <div class="appearance-grid">
+          <div class="theme-option selected" onclick="selectTheme(this)">
+            <div class="theme-preview dark"></div>
+            <div class="theme-label">Dark</div>
+          </div>
+          <div class="theme-option" onclick="selectTheme(this)">
+            <div class="theme-preview light"></div>
+            <div class="theme-label">Light</div>
+          </div>
+          <div class="theme-option" onclick="selectTheme(this)">
+            <div class="theme-preview system"></div>
+            <div class="theme-label">System</div>
+          </div>
+        </div>
+
+        <div class="form-section-label" style="margin-bottom:4px;">Preferences</div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Compact View</div>
+            <div class="toggle-desc">Reduce spacing for a denser layout</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Animations</div>
+            <div class="toggle-desc">Enable smooth transitions and effects</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Show Vote Count</div>
+            <div class="toggle-desc">Display live vote counts on active polls</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Email Notifications</div>
+            <div class="toggle-desc">Get notified about new polls and results</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+        </div>
+
+        <button class="btn-save" id="btn-save-appearance" onclick="saveSettings('btn-save-appearance')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Preferences
+        </button>
+      </div>
+    </div>
+
+    <!-- PERSONAL INFORMATION -->
+    <div class="settings-panel" id="panel-personal">
+      <div class="panel-header">
+        <div class="panel-header-icon purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="panel-header-title">Personal Information</div>
+          <div class="panel-header-sub">Update your name, email, phone and password</div>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <div class="form-section-label">Basic Details</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="John Doe" value="John Doe"/>
+          </div>
+          <div class="form-group">
+            <label>SAP ID</label>
+            <input type="text" placeholder="70XXXXXXXX" value="700012345" readonly style="opacity:0.5;cursor:not-allowed;"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="you@email.com" value="johndoe@email.com"/>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" placeholder="9876543210" value="9876543210"/>
+          </div>
+        </div>
+
+        <div style="height:1px;background:var(--card-border);margin:24px 0;"></div>
+        <div class="form-section-label">Change Password</div>
+
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" placeholder="Enter current password"/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" placeholder="Min. 6 characters"/>
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" placeholder="Repeat new password"/>
+          </div>
+        </div>
+
+        <button class="btn-save" id="btn-save-personal" onclick="saveSettings('btn-save-personal')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Changes
+        </button>
+      </div>
+    </div>
+
+    <!-- DELETE GROUPS -->
+    <div class="settings-panel" id="panel-groups">
+      <div class="panel-header">
+        <div class="panel-header-icon danger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="panel-header-title">Delete Groups</div>
+          <div class="panel-header-sub">Remove groups you have created — this cannot be undone</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="form-section-label" style="margin-bottom:18px;">Your Created Groups</div>
+        <div class="group-list" id="group-list">
+          <div class="group-item" id="group-robotics">
+            <div class="group-item-left">
+              <div class="group-dot blue">🤖</div>
+              <div>
+                <div class="group-name">Robotics Club</div>
+                <div class="group-meta">14 members · Created Jan 2025</div>
+              </div>
+            </div>
+            <button class="btn-delete-group" onclick="confirmDelete('group-robotics', 'Robotics Club')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              Delete
+            </button>
+          </div>
+
+          <div class="group-item" id="group-dance">
+            <div class="group-item-left">
+              <div class="group-dot purple">💃</div>
+              <div>
+                <div class="group-name">Dance Team</div>
+                <div class="group-meta">8 members · Created Mar 2025</div>
+              </div>
+            </div>
+            <button class="btn-delete-group" onclick="confirmDelete('group-dance', 'Dance Team')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div id="no-groups" style="display:none;padding:28px 0;text-align:center;color:var(--muted);font-size:14px;">
+          You have no groups to delete.
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="settings-panel" id="panel-logout">
+      <div class="panel-header">
+        <div class="panel-header-icon danger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+        <div>
+          <div class="panel-header-title">Logout</div>
+          <div class="panel-header-sub">End your current session securely</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="logout-area">
+          <div class="logout-info">
+            <div class="logout-icon">⚠️</div>
+            <div class="logout-info-text">
+              <div class="logout-info-title">Are you sure you want to log out?</div>
+              <div class="logout-info-desc">You will be signed out of your account on this device. Any unsaved changes will be lost. You can log back in at any time using your SAP ID and password.</div>
+            </div>
+          </div>
+          <button class="btn-logout" onclick="handleLogout()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Delete Group?</div>
+    <div class="modal-desc" id="modal-desc">Are you sure you want to delete this group? All members will be removed and this action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm-delete" id="btn-confirm-delete" onclick="deleteGroup()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Saved successfully</span>
+</div>
+
+<script>
+  // ── Panel switching ──────────────────────────────────────
+  function showPanel(name, navEl) {
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    navEl.classList.add('active');
+  }
+
+  // ── Theme selection ──────────────────────────────────────
+  function selectTheme(el) {
+    document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+
+    const label = el.querySelector('.theme-label').textContent.trim().toLowerCase();
+    const root = document.documentElement;
+
+    if (label === 'light') {
+      root.classList.add('theme-light');
+    } else if (label === 'dark') {
+      root.classList.remove('theme-light');
+    } else {
+      // System: match OS preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      prefersDark ? root.classList.remove('theme-light') : root.classList.add('theme-light');
+    }
+  }
+
+  // ── Save button ──────────────────────────────────────────
+  function saveSettings(btnId) {
+    const btn = document.getElementById(btnId);
+    const orig = btn.innerHTML;
+    btn.classList.add('saved');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Saved!`;
+    btn.disabled = true;
+    showToast('Changes saved successfully');
+    setTimeout(() => {
+      btn.classList.remove('saved');
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    }, 2500);
+  }
+
+  // ── Delete group modal ───────────────────────────────────
+  let targetGroupId = null;
+
+  function confirmDelete(groupId, groupName) {
+    targetGroupId = groupId;
+    document.getElementById('modal-title').textContent = `Delete "${groupName}"?`;
+    document.getElementById('modal-desc').textContent =
+      `Are you sure you want to delete "${groupName}"? All members will be removed and this cannot be undone.`;
+    document.getElementById('modal-overlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('show');
+    targetGroupId = null;
+  }
+
+  function deleteGroup() {
+    if (!targetGroupId) return;
+    const el = document.getElementById(targetGroupId);
+    el.style.transition = 'all 0.3s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    setTimeout(() => {
+      el.remove();
+      const remaining = document.querySelectorAll('.group-item').length;
+      if (remaining === 0) {
+        document.getElementById('no-groups').style.display = 'block';
+      }
+    }, 300);
+    closeModal();
+    showToast('Group deleted');
+  }
+
+  // ── Logout ───────────────────────────────────────────────
+  function handleLogout() {
+    showToast('Logging you out…');
+    setTimeout(() => { alert('You have been logged out.'); }, 1200);
+  }
+
+  // ── Toast ────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+</body>
+</html>

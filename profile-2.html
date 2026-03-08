@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Voting System — Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0f1a;
+    --card: #111827;
+    --card-border: rgba(255,255,255,0.07);
+    --accent: #4f8ef7;
+    --accent2: #a78bfa;
+    --accent-glow: rgba(79,142,247,0.18);
+    --text: #f0f4ff;
+    --muted: #8b95aa;
+    --input-bg: #1a2236;
+    --input-border: rgba(255,255,255,0.1);
+    --radius: 20px;
+    --success: #34d399;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 40px 48px;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(79,142,247,0.10) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 85% 80%, rgba(167,139,250,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Top nav bar ── */
+  .topbar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.5; transform:scale(1.35); }
+  }
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.2px;
+  }
+  .brand-name span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    padding: 6px 14px;
+  }
+
+  /* ── Main layout ── */
+  .page-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Profile card ── */
+  .profile-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.025),
+      0 20px 60px rgba(0,0,0,0.45);
+    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(79,142,247,0.5), rgba(167,139,250,0.4), transparent);
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Avatar area */
+  .avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .avatar {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.2), 0 8px 24px rgba(79,142,247,0.25);
+    position: relative;
+  }
+  .avatar-status {
+    position: absolute;
+    bottom: 3px; right: 3px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--success);
+    border: 2px solid var(--card);
+    box-shadow: 0 0 8px rgba(52,211,153,0.6);
+  }
+
+  .avatar-info {}
+  .avatar-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .avatar-role {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Fields */
+  .fields-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .field-item {
+    margin-bottom: 22px;
+    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .field-item:nth-child(1) { animation-delay: 0.05s; }
+  .field-item:nth-child(2) { animation-delay: 0.10s; }
+  .field-item:nth-child(3) { animation-delay: 0.15s; }
+  .field-item:nth-child(4) { animation-delay: 0.20s; }
+  .field-item:nth-child(5) { animation-delay: 0.25s; }
+
+  .field-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .field-label svg { opacity: 0.6; flex-shrink: 0; }
+
+  .field-value {
+    font-size: 14.5px;
+    font-weight: 400;
+    color: var(--text);
+    padding: 10px 0 10px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s;
+    line-height: 1.4;
+  }
+  .field-value:hover {
+    border-color: rgba(79,142,247,0.35);
+  }
+
+  /* Tags for groups */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 10px 0 10px 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.09);
+  }
+  .tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 30px;
+    border: 1px solid rgba(79,142,247,0.3);
+    color: var(--accent);
+    background: rgba(79,142,247,0.08);
+    letter-spacing: 0.2px;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .tag:hover {
+    background: rgba(79,142,247,0.15);
+    border-color: var(--accent);
+  }
+  .tag.purple {
+    color: var(--accent2);
+    border-color: rgba(167,139,250,0.3);
+    background: rgba(167,139,250,0.08);
+  }
+  .tag.purple:hover {
+    background: rgba(167,139,250,0.15);
+    border-color: var(--accent2);
+  }
+
+
+
+  /* ── Right panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .info-card:nth-child(1) { animation-delay: 0.1s; }
+  .info-card:nth-child(2) { animation-delay: 0.2s; }
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(167,139,250,0.35), transparent);
+  }
+
+  .card-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-heading-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 8px var(--accent2);
+  }
+
+  /* Activity list */
+  .activity-list { display: flex; flex-direction: column; gap: 14px; }
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .activity-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .activity-icon.blue  { background: rgba(79,142,247,0.12); }
+  .activity-icon.purple { background: rgba(167,139,250,0.12); }
+  .activity-icon.green { background: rgba(52,211,153,0.12); }
+  .activity-text { flex: 1; }
+  .activity-title {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .activity-time {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .stat-box {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .stat-box:hover {
+    border-color: rgba(79,142,247,0.3);
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    body { padding: 24px 20px; }
+    .page-layout { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 480px) {
+    body { padding: 16px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top nav -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div class="brand-name">Digital <span>Voting</span> System</div>
+  </div>
+  <div class="nav-badge">My Profile</div>
+</div>
+
+<!-- Page layout -->
+<div class="page-layout">
+
+  <!-- LEFT: Profile Card -->
+  <div class="profile-card">
+
+    <!-- Avatar + Name -->
+    <div class="avatar-section">
+      <div class="avatar">
+        JD
+        <div class="avatar-status"></div>
+      </div>
+      <div class="avatar-info">
+        <div class="avatar-name">John Doe</div>
+        <div class="avatar-role">Student · Computer Engineering</div>
+      </div>
+    </div>
+
+    <div class="fields-label">Personal Information</div>
+
+    <!-- Name -->
+    <div class="field-item">
+      <div class="field-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Name
+      </div>
+      <div class="field-value">John Doe</div>
+    </div>
+
+    <!-- Email -->
+    <div class="field-item">
+      <div class="field-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </div>
+      <div class="field-value">johndoe@email.com</div>
+    </div>
+
+    <!-- Phone -->
+    <div class="field-item">
+      <div class="field-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.55 5.55l.88-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Phone
+      </div>
+      <div class="field-value">9876543210</div>
+    </div>
+
+    <!-- SAP ID -->
+    <div class="field-item">
+      <div class="field-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        SAP ID
+      </div>
+      <div class="field-value">700012345</div>
+    </div>
+
+    <!-- My Groups -->
+    <div class="field-item">
+      <div class="field-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        My Groups
+      </div>
+      <div class="tags">
+        <span class="tag">Robotics Club</span>
+        <span class="tag purple">Dance Team</span>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- RIGHT: Dashboard panels -->
+  <div class="right-panel">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Votes Cast</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Active Polls</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">2</div>
+        <div class="stat-label">Groups</div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="info-card">
+      <div class="card-heading">
+        <div class="card-heading-dot"></div>
+        Recent Activity
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon blue">🗳️</div>
+          <div class="activity-text">
+            <div class="activity-title">Voted in Student Council Election</div>
+            <div class="activity-time">Today · 10:24 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon purple">👥</div>
+          <div class="activity-text">
+            <div class="activity-title">Joined Dance Team group</div>
+            <div class="activity-time">Yesterday · 3:15 PM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon green">✅</div>
+          <div class="activity-text">
+            <div class="activity-title">Voted in Best Canteen Poll</div>
+            <div class="activity-time">Mar 05 · 11:50 AM</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon blue">🗳️</div>
+          <div class="activity-text">
+            <div class="activity-title">Voted in Fest Theme Selection</div>
+            <div class="activity-time">Mar 03 · 9:08 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming polls -->
+    <div class="info-card">
+      <div class="card-heading">
+        <div class="card-heading-dot"></div>
+        Upcoming Polls
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon purple">📋</div>
+          <div class="activity-text">
+            <div class="activity-title">Tech Fest Speaker Vote</div>
+            <div class="activity-time">Starts Mar 10 · Robotics Club</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon blue">📋</div>
+          <div class="activity-text">
+            <div class="activity-title">Annual Day Performance Theme</div>
+            <div class="activity-time">Starts Mar 14 · Dance Team</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon green">📋</div>
+          <div class="activity-text">
+            <div class="activity-title">Department Representative Election</div>
+            <div class="activity-time">Starts Mar 18 · Computer Engineering</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -16,7 +16,6 @@ const server = http.createServer((req, res) => {
   // LOGIN
   else if (req.url === '/login' && req.method === 'GET') {
     const filePath = path.join(__dirname, 'college-portal-2.html');
-
     fs.readFile(filePath, (err, data) => {
       if (err) {
         res.writeHead(500);

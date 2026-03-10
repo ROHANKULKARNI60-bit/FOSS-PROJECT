@@ -1,0 +1,26 @@
+{
+  "name": "foss-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "db.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ROHANKULKARNI60-bit/FOSS-PROJECT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ROHANKULKARNI60-bit/FOSS-PROJECT/issues"
+  },
+  "homepage": "https://github.com/ROHANKULKARNI60-bit/FOSS-PROJECT#readme",
+  "dependencies": {
+    "import": "^0.0.6",
+    "nodemon": "^3.1.14"
+  }
+}

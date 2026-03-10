@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Voting System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<div class="portal-wrapper">
+  <div class="portal-badge">
+    <div class="badge-dot"></div>
+    <span class="badge-text">Secure Portal v2.1</span>
+  </div>
+
+  <div class="card">
+    <h1 class="portal-title">Digital <span>Voting</span> System</h1>
+    <p class="portal-subtitle">Authenticate to access the voting platform.</p>
+
+    <div class="tab-switcher">
+      <button class="tab-btn active" id="tabRegister" onclick="switchTab('register')">Register</button>
+      <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Login</button>
+    </div>
+
+    <!-- REGISTRATION FORM -->
+    <div class="form-panel active" id="panelRegister">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="e.g. Aryan Sharma" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-name">Name is required.</div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="you@university.edu" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-email">Enter a valid email.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="reg-phone" placeholder="+91 XXXXX XXXXX" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-phone">Enter a valid 10-digit number.</div>
+        </div>
+        <div class="form-group">
+          <label>SAP ID</label>
+          <input type="text" id="reg-sap" placeholder="70XXXXXXXX" autocomplete="off"/>
+          <div class="error-msg" id="err-reg-sap">SAP ID is required.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Branch</label>
+          <select id="reg-branch">
+            <option value="">Select branch</option>
+            <option>Artificial Intelligence</option>
+            <option>Civil</option>
+            <option>Computer Engineering</option>
+            <option>Computer Science - Business System</option>
+            <option>Computer Science - Data Science</option>
+            <option>Data Science</option>
+            <option>Electronics and Telecommunications</option>
+            <option>Information Technology</option>
+            <option>Mechanical</option>
+            <option>Mechatronics</option>
+          </select>
+          <div class="error-msg" id="err-reg-branch">Select your branch.</div>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="reg-year">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+          <div class="error-msg" id="err-reg-year">Select your year.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password"/>
+          <button class="pw-toggle" onclick="togglePw('reg-password', this)" tabindex="-1">
+            <svg id="eye-reg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="error-msg" id="err-reg-password">Password must be at least 6 characters.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="btn-submit" id="btn-register" onclick="handleRegister()">Register</button>
+      <div class="status-msg" id="status-register">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Registration Successful
+      </div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel" id="panelLogin">
+      <div class="form-group">
+        <label>SAP ID</label>
+        <input type="text" id="login-sap" placeholder="70XXXXXXXX" autocomplete="off"/>
+        <div class="error-msg" id="err-login-sap">SAP ID is required.</div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@university.edu" autocomplete="off"/>
+        <div class="error-msg" id="err-login-email">Enter a valid email.</div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password"/>
+          <button class="pw-toggle" onclick="togglePw('login-password', this)" tabindex="-1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="error-msg" id="err-login-password">Password is required.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="btn-submit" id="btn-login" onclick="handleLogin()">Request Access</button>
+      <div class="status-msg" id="status-login-success">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Access Granted
+      </div>
+      <div class="status-msg" id="status-login-fail">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Invalid credentials. Please retry.
+      </div>
+
+      <div class="switch-link">
+        New here? <a onclick="switchTab('register')">Create Account</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
